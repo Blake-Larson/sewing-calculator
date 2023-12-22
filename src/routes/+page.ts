@@ -4,7 +4,7 @@ export const prerender = false;
 
 export interface Project {
 	name: '';
-	number: number;
+	quantity: number;
 	components: Component[];
 }
 
@@ -13,11 +13,11 @@ export interface Component {
 	boltWidth: number | null;
 	height: number | null;
 	width: number | null;
-	number: number | null;
+	quantity: number | null;
 	orientation: 'efficient' | 'vertical' | 'horizontal' | '';
 }
 export interface ShoppingListItem {
     name: string,
     length: number,
-    amount: number,
+    quantity: number,
 }

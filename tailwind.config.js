@@ -2,10 +2,20 @@
 export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
-		extend: {},
+		extend: {
+			animation: {
+				'fade-in': 'fadeIn 0.5s ease-in forwards'
+			},
+			keyframes: {
+				fadeIn: {
+					'0%': { opacity: 0 },
+					'100%': { opacity: 1 }
+				}
+			}
+		},
 		fontFamily: {
-			sans: ['ui-sans-serif', 'system-ui'],
-			serif: ['ui-serif', 'Georgia'],
+			sans: ['Poppins', 'ui-sans-serif', 'system-ui'],
+			serif: ['Playfair Display', 'ui-serif', 'Georgia'],
 			mono: ['ui-monospace', 'SFMono-Regular']
 		}
 	},

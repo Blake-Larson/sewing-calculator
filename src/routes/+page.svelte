@@ -9,14 +9,14 @@
 
 	let project: Project = {
 		name: '',
-		number: 1,
+		quantity: 1,
 		components: [
 			{
 				name: '',
 				boltWidth: null,
 				height: null,
 				width: null,
-				number: null,
+				quantity: null,
 				orientation: ''
 			}
 		]
@@ -29,10 +29,10 @@
 	}
 
 	function generateShoppingList() {
-		if (!isFormValid()) {
-			console.error('Form is not valid. Please fill all required fields.');
-			return;
-		}
+		// if (!isFormValid()) {
+		// 	console.error('Form is not valid. Please fill all required fields.');
+		// 	return;
+		// }
 
 		let shoppingList: ShoppingListItem[] = [];
 		project.components.forEach((component) => shoppingList.push(calculateFabricLength(component)));
@@ -43,11 +43,11 @@
 	function calculateFabricLength(component: Component) {
 		let length = 0;
 
-		if (!component.number) {
+		if (!component.quantity) {
 			return {
 				name: component.name,
 				length: 0,
-				amount: 0
+				quantity: 0
 			};
 		}
 
@@ -60,19 +60,19 @@
 		}
 
 		function calculateWidthAligned() {
-			if (!component.boltWidth || !component.height || !component.width || !component.number)
+			if (!component.boltWidth || !component.height || !component.width || !component.quantity)
 				return 0;
 			let columnsWidthAligned = Math.floor(component.boltWidth / component.width);
-			let rowsWidthAligned = Math.ceil((component.number * project.number) / columnsWidthAligned);
+			let rowsWidthAligned = Math.ceil((component.quantity * project.quantity) / columnsWidthAligned);
 			let totalLengthWidthAligned = rowsWidthAligned * component.height;
 			return totalLengthWidthAligned;
 		}
 
 		function calculateHeightAligned() {
-			if (!component.boltWidth || !component.height || !component.width || !component.number)
+			if (!component.boltWidth || !component.height || !component.width || !component.quantity)
 				return 0;
 			let columnsHeightAligned = Math.floor(component.boltWidth / component.height);
-			let rowsHeightAligned = Math.ceil((component.number * project.number) / columnsHeightAligned);
+			let rowsHeightAligned = Math.ceil((component.quantity * project.quantity) / columnsHeightAligned);
 			let totalLengthHeightAligned = rowsHeightAligned * component.width;
 			return totalLengthHeightAligned;
 		}
@@ -88,12 +88,12 @@
 		return {
 			name: component.name,
 			length: length,
-			amount: component.number * project.number
+			quantity: component.quantity * project.quantity
 		};
 	}
 
 	function isFormValid() {
-		if (!project.name || !project.number) {
+		if (!project.name || !project.quantity) {
 			return false;
 		}
 		for (let component of project.components) {
@@ -102,7 +102,7 @@
 				!component.boltWidth ||
 				!component.height ||
 				!component.width ||
-				!component.number ||
+				!component.quantity ||
 				!component.orientation
 			) {
 				return false;
@@ -117,24 +117,33 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<form class="flex w-full flex-col gap-5 p-5">
-	<div class="flex w-full flex-col items-center gap-2">
-		<div class="flex gap-2 items-center">
+<form class="flex w-full flex-col items-center gap-5 p-5">
+	<section class="flex w-full flex-col items-center gap-2">
+		<div class="flex items-center gap-2">
 			<input
 				bind:value={project.name}
-				class="input w-full max-w-xs rounded-lg input-ghost input-lg"
+				class="input input-ghost input-lg w-64 rounded-lg font-serif"
 				type="text"
 				placeholder="My Project"
 				required
+				style="font-size: 30px;"
 			/>
-			<span>x</span>
-			<input bind:value={project.number} class="input w-20 rounded-lg" type="number" required />
+			<span class="text-3xl">x</span>
+			<input
+				bind:value={project.quantity}
+				class="input input-ghost input-lg w-28 rounded-lg"
+				type="quantity"
+				required
+				style="font-size: 30px;"
+			/>
 		</div>
-	</div>
-	<div class="flex w-full flex-col items-center gap-5">
-		<h2>Components</h2>
+	</section>
+	<section class="flex w-full flex-col items-center gap-5">
+		<h2 class="font-serif text-2xl">Components</h2>
 		{#each project.components as component, i}
-			<div class="relative flex w-full max-w-sm flex-col rounded-box bg-secondary p-10">
+			<div
+				class="animate-fade-in relative flex w-full max-w-sm flex-col rounded-box bg-secondary p-10"
+			>
 				<button
 					type="button"
 					class="btn btn-square btn-ghost btn-sm absolute left-1 top-1"
@@ -160,53 +169,57 @@
 						placeholder="Name"
 						required
 					/>
-					<label class="form-control w-full max-w-xs flex-row justify-end">
-						<div class="label">
-							<span class="label-text">Width of Bolt(in):</span>
-						</div>
-						<input
-							bind:value={component.boltWidth}
-							class="input w-20 rounded-lg"
-							type="number"
-							required
-						/>
-					</label>
-					<label class="form-control w-full max-w-xs flex-row justify-end">
-						<div class="label">
-							<span class="label-text">Number needed for one project:</span>
-						</div>
-						<input
-							bind:value={component.number}
-							class="input w-20 rounded-lg"
-							type="number"
-							required
-						/>
-					</label>
-					<label class="form-control w-full max-w-xs flex-row justify-end">
-						<div class="label">
-							<span class="label-text">Height(in):</span>
-						</div>
-						<input
-							bind:value={component.height}
-							class="input w-20 rounded-lg"
-							type="number"
-							required
-						/>
-					</label>
-					<label class="form-control w-full max-w-xs flex-row justify-end">
-						<div class="label">
-							<span class="label-text">Width(in):</span>
-						</div>
-						<input
-							bind:value={component.width}
-							class="input w-20 rounded-lg"
-							type="number"
-							required
-						/>
-					</label>
+					<div class="flex w-full items-center justify-between">
+						<label class="flex w-full flex-col">
+							<div class="label">
+								<span class="label-text">Width of Bolt (in):</span>
+							</div>
+							<input
+								bind:value={component.boltWidth}
+								class="input w-28 rounded-lg"
+								type="quantity"
+								required
+							/>
+						</label>
+						<label class="flex w-full flex-col">
+							<div class="label">
+								<span class="label-text">Quantity:</span>
+							</div>
+							<input
+								bind:value={component.quantity}
+								class="input w-28 rounded-lg"
+								type="quantity"
+								required
+							/>
+						</label>
+					</div>
+					<div class="flex w-full items-center justify-between">
+						<label class="flex w-full flex-col">
+							<div class="label">
+								<span class="label-text">Height (in):</span>
+							</div>
+							<input
+								bind:value={component.height}
+								class="input w-28 rounded-lg"
+								type="quantity"
+								required
+							/>
+						</label>
+						<label class="flex w-full flex-col">
+							<div class="label">
+								<span class="label-text">Width (in):</span>
+							</div>
+							<input
+								bind:value={component.width}
+								class="input w-28 rounded-lg"
+								type="quantity"
+								required
+							/>
+						</label>
+					</div>
 					<select
 						bind:value={component.orientation}
-						class="select select-bordered w-full max-w-xs rounded-lg"
+						class="select select-bordered mt-4 w-full max-w-xs rounded-lg"
 						required
 					>
 						<option disabled selected value="">Orientation</option>
@@ -228,7 +241,7 @@
 						boltWidth: 0,
 						height: 0,
 						width: 0,
-						number: 0,
+						quantity: 0,
 						orientation: ''
 					}
 				])}
@@ -252,20 +265,35 @@
 			class="btn btn-primary"
 			on:click={() => (shoppingList = generateShoppingList())}>Generate shopping list</button
 		>
-	</div>
+	</section>
 
 	{#if shoppingList && shoppingList.length > 0}
-		<div class="flex w-full flex-col gap-5">
+		<section class="flex flex-col items-center overflow-x-auto">
 			<h2>
-				Shopping List for {project.number + ' '}{project.name
+				Shopping List for {project.quantity + ' '}{project.name
 					? project.name
-					: '...'}{project.number > 1 ? 's' : ''}
+					: '...'}{project.quantity > 1 ? 's' : ''}
 			</h2>
-			<ul>
-				{#each shoppingList ?? [] as item}
-					<li>{item.amount} x {item.name}: {item.length} inches</li>
-				{/each}
-			</ul>
-		</div>
+			<table class="table table-xs md:table-lg">
+				<!-- head -->
+
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Quantity to Make</th>
+						<th>Total Length Needed</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each shoppingList ?? [] as item}
+						<tr>
+							<td>{item.name}</td>
+							<td>{item.quantity}</td>
+							<td>{item.length} inches</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</section>
 	{/if}
 </form>
