@@ -1,10 +1,9 @@
 {
-	"name": "karissa-2.0",
+	"name": "sewing-calculator",
 	"version": "0.0.1",
 	"scripts": {
-		"prebuild": "node ./scripts/generateImageDimensions.js",
-		"dev": "npm run prebuild && vite dev",
-		"build": "npm run prebuild && vite build",
+		"dev": "vite dev",
+		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
