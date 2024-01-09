@@ -191,7 +191,6 @@
 					class="relative flex w-full max-w-sm animate-fade-in flex-col rounded-box bg-secondary p-10"
 				>
 					<button
-						type="button"
 						class="btn btn-square btn-ghost btn-sm absolute left-1 top-1"
 						on:click={(e) => deleteComponent(e, i)}
 					>
@@ -223,7 +222,7 @@
 								<input
 									bind:value={component.boltWidth}
 									class="input w-28 rounded-lg"
-									type="quantity"
+									type="number"
 									required
 								/>
 							</label>
@@ -234,7 +233,7 @@
 								<input
 									bind:value={component.quantity}
 									class="input w-28 rounded-lg"
-									type="quantity"
+									type="number"
 									required
 								/>
 							</label>
@@ -247,7 +246,7 @@
 								<input
 									bind:value={component.height}
 									class="input w-28 rounded-lg"
-									type="quantity"
+									type="number"
 									required
 								/>
 							</label>
@@ -258,7 +257,7 @@
 								<input
 									bind:value={component.width}
 									class="input w-28 rounded-lg"
-									type="quantity"
+									type="number"
 									required
 								/>
 							</label>
@@ -278,7 +277,6 @@
 			{/each}
 		</div>
 		<button
-			type="button"
 			class="btn btn-square btn-ghost"
 			on:click={() =>
 				(project.components = [
