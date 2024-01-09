@@ -2,6 +2,7 @@
 	import { analyticsInit } from '../modules/analytics';
 	import { onMount } from 'svelte';
 	import type { Component, Project, ShoppingListItem } from './+page.ts';
+	import { flip } from 'svelte/animate';
 
 	onMount(() => {
 		analyticsInit();
@@ -29,14 +30,13 @@
 	}
 
 	function generateShoppingList() {
-		// if (!isFormValid()) {
-		// 	console.error('Form is not valid. Please fill all required fields.');
-		// 	return;
-		// }
+		if (!isFormValid()) {
+			console.error('Form is not valid. Please fill all required fields.');
+			return;
+		}
 
 		let shoppingList: ShoppingListItem[] = [];
 		project.components.forEach((component) => shoppingList.push(calculateFabricLength(component)));
-		console.log(shoppingList);
 		return shoppingList;
 	}
 
@@ -63,7 +63,9 @@
 			if (!component.boltWidth || !component.height || !component.width || !component.quantity)
 				return 0;
 			let columnsWidthAligned = Math.floor(component.boltWidth / component.width);
-			let rowsWidthAligned = Math.ceil((component.quantity * project.quantity) / columnsWidthAligned);
+			let rowsWidthAligned = Math.ceil(
+				(component.quantity * project.quantity) / columnsWidthAligned
+			);
 			let totalLengthWidthAligned = rowsWidthAligned * component.height;
 			return totalLengthWidthAligned;
 		}
@@ -72,7 +74,9 @@
 			if (!component.boltWidth || !component.height || !component.width || !component.quantity)
 				return 0;
 			let columnsHeightAligned = Math.floor(component.boltWidth / component.height);
-			let rowsHeightAligned = Math.ceil((component.quantity * project.quantity) / columnsHeightAligned);
+			let rowsHeightAligned = Math.ceil(
+				(component.quantity * project.quantity) / columnsHeightAligned
+			);
 			let totalLengthHeightAligned = rowsHeightAligned * component.width;
 			return totalLengthHeightAligned;
 		}
@@ -110,6 +114,39 @@
 		}
 		return true;
 	}
+
+	function resetPage() {
+		project = {
+			name: '',
+			quantity: 1,
+			components: [
+				{
+					name: '',
+					boltWidth: null,
+					height: null,
+					width: null,
+					quantity: null,
+					orientation: ''
+				}
+			]
+		};
+
+		shoppingList = [];
+	}
+
+	let copied = false;
+
+	async function exportList() {
+		if (!shoppingList || shoppingList.length === 0) return;
+		let listText = shoppingList
+			.map((item) => `${item.name}, ${item.quantity}, ${item.length} inches`)
+			.join('\n');
+		await navigator.clipboard.writeText(listText);
+		copied = true;
+		setTimeout(() => {
+			copied = false;
+		}, 2000); // Hide the popup after 2 seconds
+	}
 </script>
 
 <svelte:head>
@@ -122,114 +159,116 @@
 		<div class="flex items-center gap-2">
 			<input
 				bind:value={project.name}
-				class="input input-ghost input-lg w-64 rounded-lg font-serif"
+				class="input input-ghost input-lg w-48 rounded-lg font-serif lg:w-64"
 				type="text"
 				placeholder="My Project"
 				required
-				style="font-size: 30px;"
 			/>
-			<span class="text-3xl">x</span>
+			<span class="text-xl">x</span>
 			<input
 				bind:value={project.quantity}
-				class="input input-ghost input-lg w-28 rounded-lg"
-				type="quantity"
+				class="input input-ghost input-lg w-20 rounded-lg lg:w-28"
+				type="number"
 				required
-				style="font-size: 30px;"
 			/>
 		</div>
 	</section>
 	<section class="flex w-full flex-col items-center gap-5">
 		<h2 class="font-serif text-2xl">Components</h2>
-		{#each project.components as component, i}
-			<div
-				class="animate-fade-in relative flex w-full max-w-sm flex-col rounded-box bg-secondary p-10"
-			>
-				<button
-					type="button"
-					class="btn btn-square btn-ghost btn-sm absolute left-1 top-1"
-					on:click={() => deleteComponent(i)}
+		<div
+			class="flex w-full flex-col items-center gap-5 lg:max-w-4xl lg:flex-row lg:flex-wrap lg:justify-center"
+		>
+			{#each project.components as component, i}
+				<div
+					class="relative flex w-full max-w-sm animate-fade-in flex-col rounded-box bg-secondary p-10"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke-width="1.5"
-						stroke="currentColor"
-						class="h-6 w-6"
+					<button
+						type="button"
+						class="btn btn-square btn-ghost btn-sm absolute left-1 top-1"
+						on:click={() => deleteComponent(i)}
 					>
-						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-					</svg>
-				</button>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="h-6 w-6"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+						</svg>
+					</button>
 
-				<div class="flex w-full flex-col items-center gap-2">
-					<input
-						bind:value={component.name}
-						class="input input-bordered w-full max-w-xs rounded-lg"
-						type="text"
-						placeholder="Name"
-						required
-					/>
-					<div class="flex w-full items-center justify-between">
-						<label class="flex w-full flex-col">
-							<div class="label">
-								<span class="label-text">Width of Bolt (in):</span>
-							</div>
-							<input
-								bind:value={component.boltWidth}
-								class="input w-28 rounded-lg"
-								type="quantity"
-								required
-							/>
-						</label>
-						<label class="flex w-full flex-col">
-							<div class="label">
-								<span class="label-text">Quantity:</span>
-							</div>
-							<input
-								bind:value={component.quantity}
-								class="input w-28 rounded-lg"
-								type="quantity"
-								required
-							/>
-						</label>
+					<div class="flex w-full flex-col items-center gap-2">
+						<input
+							bind:value={component.name}
+							class="input input-bordered w-full max-w-xs rounded-lg"
+							type="text"
+							placeholder="Name"
+							required
+						/>
+						<div class="xs:flex-row flex w-full flex-col items-center justify-between">
+							<label class="xs:items-start flex w-full flex-col items-center">
+								<div class="label">
+									<span class="label-text">Width of Bolt (in):</span>
+								</div>
+								<input
+									bind:value={component.boltWidth}
+									class="input w-28 rounded-lg"
+									type="quantity"
+									required
+								/>
+							</label>
+							<label class="xs:items-start flex w-full flex-col items-center">
+								<div class="label">
+									<span class="label-text">Quantity:</span>
+								</div>
+								<input
+									bind:value={component.quantity}
+									class="input w-28 rounded-lg"
+									type="quantity"
+									required
+								/>
+							</label>
+						</div>
+						<div class="xs:flex-row flex w-full flex-col items-center justify-between">
+							<label class="xs:items-start flex w-full flex-col items-center">
+								<div class="label">
+									<span class="label-text">Height (in):</span>
+								</div>
+								<input
+									bind:value={component.height}
+									class="input w-28 rounded-lg"
+									type="quantity"
+									required
+								/>
+							</label>
+							<label class="xs:items-start flex w-full flex-col items-center">
+								<div class="label">
+									<span class="label-text">Width (in):</span>
+								</div>
+								<input
+									bind:value={component.width}
+									class="input w-28 rounded-lg"
+									type="quantity"
+									required
+								/>
+							</label>
+						</div>
+						<select
+							bind:value={component.orientation}
+							class="select select-bordered mt-4 w-full max-w-xs rounded-lg"
+							required
+						>
+							<option disabled selected value="">Orientation</option>
+							<option value="efficient">Most efficient use of fabric</option>
+							<option value="vertical">Height is aligned with Width of Bolt</option>
+							<option value="horizontal">Height is aligned with Length of Bolt</option>
+						</select>
 					</div>
-					<div class="flex w-full items-center justify-between">
-						<label class="flex w-full flex-col">
-							<div class="label">
-								<span class="label-text">Height (in):</span>
-							</div>
-							<input
-								bind:value={component.height}
-								class="input w-28 rounded-lg"
-								type="quantity"
-								required
-							/>
-						</label>
-						<label class="flex w-full flex-col">
-							<div class="label">
-								<span class="label-text">Width (in):</span>
-							</div>
-							<input
-								bind:value={component.width}
-								class="input w-28 rounded-lg"
-								type="quantity"
-								required
-							/>
-						</label>
-					</div>
-					<select
-						bind:value={component.orientation}
-						class="select select-bordered mt-4 w-full max-w-xs rounded-lg"
-						required
-					>
-						<option disabled selected value="">Orientation</option>
-						<option value="efficient">Most efficient</option>
-						<option value="vertical">Height is vertical</option>
-						<option value="horizontal">Height is horizontal</option>
-					</select>
 				</div>
-			</div>
-		{/each}
+			{/each}
+		</div>
 		<button
 			type="button"
 			class="btn btn-square btn-ghost"
@@ -263,37 +302,51 @@
 		<button
 			type="submit"
 			class="btn btn-primary"
-			on:click={() => (shoppingList = generateShoppingList())}>Generate shopping list</button
+			on:click={() => (shoppingList = generateShoppingList())}
+			>{shoppingList && shoppingList.length > 0
+				? 'Refresh shopping list'
+				: 'Generate shopping list'}</button
 		>
 	</section>
 
 	{#if shoppingList && shoppingList.length > 0}
-		<section class="flex flex-col items-center overflow-x-auto">
-			<h2>
-				Shopping List for {project.quantity + ' '}{project.name
-					? project.name
-					: '...'}{project.quantity > 1 ? 's' : ''}
-			</h2>
-			<table class="table table-xs md:table-lg">
-				<!-- head -->
+	<section class="flex flex-col items-center gap-5 overflow-x-auto animate-fade-in">
+		<h2>
+			Shopping List for {project.quantity + ' '}{project.name
+				? project.name
+				: '...'}{project.quantity > 1 ? 's' : ''}
+		</h2>
+		<table class="table table-xs md:table-lg">
+			<!-- head -->
 
-				<thead>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Quantity to Make</th>
+					<th>Total Length Needed</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each shoppingList ?? [] as item}
 					<tr>
-						<th>Name</th>
-						<th>Quantity to Make</th>
-						<th>Total Length Needed</th>
+						<td>{item.name}</td>
+						<td>{item.quantity}</td>
+						<td>{item.length} inches</td>
 					</tr>
-				</thead>
-				<tbody>
-					{#each shoppingList ?? [] as item}
-						<tr>
-							<td>{item.name}</td>
-							<td>{item.quantity}</td>
-							<td>{item.length} inches</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
-		</section>
+				{/each}
+			</tbody>
+		</table>
+		<div class="flex gap-3">
+			{#if copied}
+				<div class="toast">
+					<div class="alert alert-info">
+						<span>Copied to clipboard!</span>
+					</div>
+				</div>
+			{/if}
+			<button on:click={exportList} class="btn btn-accent">Copy List</button>
+			<button on:click={resetPage} class="btn btn-primary">New Project</button>
+		</div>
+	</section>
 	{/if}
 </form>
