@@ -2,7 +2,6 @@
 	import { analyticsInit } from '../modules/analytics';
 	import { onMount } from 'svelte';
 	import type { Component, Project, ShoppingListItem } from './+page.ts';
-	import { flip } from 'svelte/animate';
 
 	onMount(() => {
 		analyticsInit();
@@ -25,11 +24,13 @@
 
 	let shoppingList: ShoppingListItem[] | undefined = [];
 
-	function deleteComponent(selectedIndex: number) {
+	function deleteComponent(e: Event, selectedIndex: number) {
+		e.preventDefault();
 		return (project.components = project.components.filter((_, i) => i !== selectedIndex));
 	}
 
-	function generateShoppingList() {
+	function generateShoppingList(e: Event) {
+		e.preventDefault();
 		if (!isFormValid()) {
 			console.error('Form is not valid. Please fill all required fields.');
 			return;
@@ -37,6 +38,13 @@
 
 		let shoppingList: ShoppingListItem[] = [];
 		project.components.forEach((component) => shoppingList.push(calculateFabricLength(component)));
+
+		setTimeout(() => {
+			let list = document.getElementById('list');
+			if (list) {
+				list.scrollIntoView({ behavior: 'smooth' });
+			}
+		}, 100);
 		return shoppingList;
 	}
 
@@ -115,7 +123,8 @@
 		return true;
 	}
 
-	function resetPage() {
+	function resetPage(e: Event) {
+		e.preventDefault();
 		project = {
 			name: '',
 			quantity: 1,
@@ -136,11 +145,10 @@
 
 	let copied = false;
 
-	async function exportList() {
+	async function exportList(e: Event) {
+		e.preventDefault();
 		if (!shoppingList || shoppingList.length === 0) return;
-		let listText = shoppingList
-			.map((item) => `${item.name}, ${item.quantity}, ${item.length} inches`)
-			.join('\n');
+		let listText = shoppingList.map((item) => `${item.name}, ${item.length} inches`).join('\n');
 		await navigator.clipboard.writeText(listText);
 		copied = true;
 		setTimeout(() => {
@@ -185,7 +193,7 @@
 					<button
 						type="button"
 						class="btn btn-square btn-ghost btn-sm absolute left-1 top-1"
-						on:click={() => deleteComponent(i)}
+						on:click={(e) => deleteComponent(e, i)}
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -302,7 +310,7 @@
 		<button
 			type="submit"
 			class="btn btn-primary"
-			on:click={() => (shoppingList = generateShoppingList())}
+			on:click={(e) => (shoppingList = generateShoppingList(e))}
 			>{shoppingList && shoppingList.length > 0
 				? 'Refresh shopping list'
 				: 'Generate shopping list'}</button
@@ -310,43 +318,43 @@
 	</section>
 
 	{#if shoppingList && shoppingList.length > 0}
-	<section class="flex flex-col items-center gap-5 overflow-x-auto animate-fade-in">
-		<h2>
-			Shopping List for {project.quantity + ' '}{project.name
-				? project.name
-				: '...'}{project.quantity > 1 ? 's' : ''}
-		</h2>
-		<table class="table table-xs md:table-lg">
-			<!-- head -->
+		<section id="list" class="flex animate-fade-in flex-col items-center gap-5 overflow-x-auto">
+			<h2>
+				Shopping List for {project.quantity + ' '}{project.name
+					? project.name
+					: '...'}{project.quantity > 1 ? 's' : ''}
+			</h2>
+			<table class="table table-xs md:table-lg">
+				<!-- head -->
 
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Quantity to Make</th>
-					<th>Total Length Needed</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each shoppingList ?? [] as item}
+				<thead>
 					<tr>
-						<td>{item.name}</td>
-						<td>{item.quantity}</td>
-						<td>{item.length} inches</td>
+						<th>Name</th>
+						<th>Quantity to Make</th>
+						<th>Total Length Needed</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
-		<div class="flex gap-3">
-			{#if copied}
-				<div class="toast">
-					<div class="alert alert-info">
-						<span>Copied to clipboard!</span>
+				</thead>
+				<tbody>
+					{#each shoppingList ?? [] as item}
+						<tr>
+							<td>{item.name}</td>
+							<td>{item.quantity}</td>
+							<td>{item.length} inches</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+			<div class="flex gap-3">
+				{#if copied}
+					<div class="toast toast-top toast-start">
+						<div class="alert alert-info">
+							<span>Copied to clipboard!</span>
+						</div>
 					</div>
-				</div>
-			{/if}
-			<button on:click={exportList} class="btn btn-accent">Copy List</button>
-			<button on:click={resetPage} class="btn btn-primary">New Project</button>
-		</div>
-	</section>
+				{/if}
+				<button on:click={(e) => exportList(e)} class="btn btn-accent">Copy List</button>
+				<button on:click={(e) => resetPage(e)} class="btn btn-primary">New Project</button>
+			</div>
+		</section>
 	{/if}
 </form>
