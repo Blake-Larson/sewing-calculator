@@ -182,7 +182,7 @@
 		</div>
 	</section>
 	<section class="flex w-full flex-col items-center gap-5">
-		<h2 class="font-serif text-2xl">Components</h2>
+		<h2 class="font-serif text-xl">Components</h2>
 		<div
 			class="flex w-full flex-col items-center gap-5 lg:max-w-4xl lg:flex-row lg:flex-wrap lg:justify-center"
 		>
