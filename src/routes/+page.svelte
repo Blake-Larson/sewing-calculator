@@ -32,10 +32,10 @@
 
 	function generateShoppingList(e: Event) {
 		e.preventDefault();
-		if (!isFormValid()) {
-			console.error('Form is not valid. Please fill all required fields.');
-			return;
-		}
+		// if (!isFormValid()) {
+		// 	console.error('Form is not valid. Please fill all required fields.');
+		// 	return;
+		// }
 
 		let shoppingList: ShoppingListItem[] = [];
 		project.components.forEach((component) => shoppingList.push(calculateFabricLength(component)));
@@ -164,7 +164,7 @@
 </svelte:head>
 
 <div class="flex w-full flex-col p-5">
-	<div class="flex gap-3 items-center justify-center">
+	<div class="flex items-center justify-center gap-3">
 		<div class="btn btn-circle btn-ghost mt-1">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -238,8 +238,8 @@
 								placeholder="Name"
 								required
 							/>
-							<div class="xs:flex-row flex w-full flex-col items-center justify-between">
-								<label class="xs:items-start flex w-full flex-col items-center">
+							<div class="flex w-full flex-col items-center justify-between xs:flex-row">
+								<label class="flex w-full flex-col items-center xs:items-start">
 									<div class="label">
 										<span class="label-text">Width of Bolt (in):</span>
 									</div>
@@ -250,7 +250,7 @@
 										required
 									/>
 								</label>
-								<label class="xs:items-start flex w-full flex-col items-center">
+								<label class="flex w-full flex-col items-center xs:items-start">
 									<div class="label">
 										<span class="label-text">Quantity:</span>
 									</div>
@@ -262,8 +262,8 @@
 									/>
 								</label>
 							</div>
-							<div class="xs:flex-row flex w-full flex-col items-center justify-between">
-								<label class="xs:items-start flex w-full flex-col items-center">
+							<div class="flex w-full flex-col items-center justify-between xs:flex-row">
+								<label class="flex w-full flex-col items-center xs:items-start">
 									<div class="label">
 										<span class="label-text">Height (in):</span>
 									</div>
@@ -274,7 +274,7 @@
 										required
 									/>
 								</label>
-								<label class="xs:items-start flex w-full flex-col items-center">
+								<label class="flex w-full flex-col items-center xs:items-start">
 									<div class="label">
 										<span class="label-text">Width (in):</span>
 									</div>
@@ -340,11 +340,10 @@
 		</section>
 	</form>
 	{#if shoppingList && shoppingList.length > 0}
-		<section id="list" class="flex animate-fade-in flex-col items-center gap-5 overflow-x-auto">
-			<h2>
-				Shopping List for {project.quantity + ' '}{project.name
-					? project.name
-					: '...'}{project.quantity > 1 ? 's' : ''}
+		<section id="list" class="flex animate-fade-in flex-col items-center gap-5 overflow-x-auto pt-10">
+			<Squiggle />
+			<h2 class="self-start font-serif text-xl">
+				Shopping List for {project.quantity + ' '}{project.name}
 			</h2>
 			<table class="table table-xs md:table-lg">
 				<!-- head -->
@@ -366,7 +365,7 @@
 					{/each}
 				</tbody>
 			</table>
-			<div class="flex gap-3">
+			<div class="flex gap-3 pt-5">
 				{#if copied}
 					<div class="toast toast-start toast-top">
 						<div class="alert alert-info">
