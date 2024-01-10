@@ -2,6 +2,7 @@
 	import { analyticsInit } from '../modules/analytics';
 	import { onMount } from 'svelte';
 	import type { Component, Project, ShoppingListItem } from './+page.ts';
+	import Squiggle from './Squiggle.svelte';
 
 	onMount(() => {
 		analyticsInit();
@@ -183,7 +184,9 @@
 		<h1 class="text-center font-serif text-2xl">Sewing Calculator</h1>
 	</div>
 
-	<form class="flex w-full flex-col items-center gap-5">
+	<Squiggle />
+
+	<form class="flex w-full flex-col items-center gap-5 pt-5">
 		<section class="flex w-full flex-col items-center gap-2">
 			<div class="flex items-center gap-2">
 				<input
