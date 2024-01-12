@@ -158,11 +158,6 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
-</svelte:head>
-
 <div class="flex w-full flex-col p-5">
 	<div class="flex items-center justify-center gap-3">
 		<div class="btn btn-circle btn-ghost mt-1">
